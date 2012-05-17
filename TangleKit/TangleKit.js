@@ -217,12 +217,24 @@ Tangle.classes.TKAdjustableNumber = {
     },
     
     touchDidMove: function (touches) {
-        var value = this.valueAtMouseDown + touches.translation.x / 5 * this.step;
+	//lets Tangle respond WITHIN drag duration to new attribute settings
+        var attributes = this.element.attributes;
+        var regexp = /^data-[\w\-]+$/;
+        for (var i = 0, length = attributes.length; i < length; i++) {
+
+            var attr = attributes[i];
+            var attrName = attr.name;
+            if (!attrName || !regexp.test(attrName)) { continue; }
+            
+            this[attrName.substr(5)] = attr.value;
+        }
+
+	var value = this.valueAtMouseDown + touches.translation.x / 5 * this.step;
         value = ((value / this.step).round() * this.step).limit(this.min, this.max);
         this.tangle.setValue(this.variable, value);
         this.updateHelp();
     },
-    
+
     touchDidGoUp: function (touches) {
         this.isDragging = false;
         isAnyAdjustableNumberDragging = false;
